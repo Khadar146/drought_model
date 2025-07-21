@@ -1,0 +1,27 @@
+name = "droughtmodel"
+version = "0.1.0"
+license = "MIT"
+author = "Khadar Dahir"
+maintainer = "khadardahir146@gmail.com"
+copyright = "Copyright 2025, Khadar"
+
+[build]
+auto-executables = true
+auto-tests = true
+auto-examples = true
+module-naming = false
+link = ["netcdff"]
+external-modules = ["netcdf"]
+
+[fortran]
+implicit-typing = false
+implicit-external = false
+source-form = "free"
+
+[[executable]]
+name = "main"
+source-dir = "app"
+main = "main.f90"
+
+[dependencies]
+stdlib = "*"
