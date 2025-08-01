@@ -1,8 +1,14 @@
-project: Drought Modelling in Fortran
-output_dir: ./docs/html
+project: DroughtModel
 summary: >
-  This is a modular Fortran-based framework to calculate SPI and SPEI, perform predictor selection, and support drought forecasting and extreme value modelling for Somaliland.
-author: Khadar Daahir Abdisalan
-license: MIT
-github: 
-src_dir: ./src
+  A modular Fortran model to assess historical and projected drought
+  intensity and frequency in Somaliland using SPI and EVT indices.
+
+author: Khadar Daahir
+email: khadar@glasgow.ac.uk
+institution: University of Glasgow, Climate Dynamics Lab
+
+source-dir: src
+output-dir: docs/html
+
+display: public
+colours: light

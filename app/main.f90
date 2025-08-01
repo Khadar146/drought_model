@@ -1,35 +1,35 @@
+!> @file main.f90
+!! @brief Main application for drought modelling in Somaliland
+!! @details Loads climate data and runs the drought analysis pipeline
+!!          including SPI, EVT, and future forecasting modules.
+!!
+!!          Currently active: NetCDF data loading using io_mod.
+!!          SPI and EVT modules are scaffolded for later integration.
+!!
+!! @author Khadar Daahir
+!! @affiliation University of Glasgow, Climate Dynamics Lab
+!! @date July 2025
+
 program main
-  ! -------------------------------------------------------------------
-  ! MSc Drought Modelling – Main Program
-  ! Purpose: Executes the drought analysis workflow for Somaliland
-  ! using SPI, EVT, and forecasting modules with NetCDF input.
-  !
-  ! Author: Khadar
-  ! Date: June - August 2025
-  ! -------------------------------------------------------------------
-  use spi_mod         ! Computes SPI from NetCDF data (includes loading + preprocessing)
-  ! use evt_mod       ! Applies Extreme Value Theory to SPI results (future implementation)
-  ! use forecast_mod  ! Performs drought forecasting (e.g. regression) (future implementation)
+  use io_mod
   implicit none
 
-  ! Welcome message
-  print *, "---------------------------------------------"
-  print *, " Running Drought Modelling Pipeline..."
-  print *, "---------------------------------------------"
+  character(len=100) :: filename
+  real(wp), allocatable :: precip(:,:,:), lon(:), lat(:), time(:)
+  integer :: status
 
-  ! Step 1: Compute SPI from historical and/or future data
-  call run_spi_module()
+  print *, "Reading NetCDF precipitation data..."
+  filename = "data/historical/precip_monthly.nc" 
 
-  ! Step 2: Apply EVT to analyse severity and frequency
-  ! call run_evt_module()
+  call read_precip_from_netcdf(trim(filename), precip, lon, lat, time, status)
 
-  ! Step 3: Run drought forecasting using climate predictors
-  ! call run_forecast_module()
-
-  ! Completion message
-  print *, "---------------------------------------------"
-  print *, " Pipeline completed successfully."
-  print *, " Outputs saved to /output."
-  print *, "---------------------------------------------"
-
+  if (status == 0) then
+    print *, "File read successfully!"
+    print *, "Dimensions:"
+    print *, "  Longitude points:", size(lon)
+    print *, "  Latitude points :", size(lat)
+    print *, "  Time steps      :", size(time)
+  else
+    print *, "NetCDF read failed. Status code =", status
+  end if
 end program main
