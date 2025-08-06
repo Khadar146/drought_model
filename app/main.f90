@@ -1,35 +1,17 @@
-!> @file main.f90
-!! @brief Main application for drought modelling in Somaliland
-!! @details Loads climate data and runs the drought analysis pipeline
-!!          including SPI, EVT, and future forecasting modules.
-!!
-!!          Currently active: NetCDF data loading using io_mod.
-!!          SPI and EVT modules are scaffolded for later integration.
-!!
-!! @author Khadar Daahir
-!! @affiliation University of Glasgow, Climate Dynamics Lab
-!! @date July 2025
-
 program main
-  use io_mod
+  use io_mod, only: read_precip_from_netcdf
+  use iso_fortran_env, only: wp => real64
   implicit none
 
-  character(len=100) :: filename
-  real(wp), allocatable :: precip(:,:,:), lon(:), lat(:), time(:)
-  integer :: status
+  ! --- Declare dimensions and data array ---
+  integer, parameter :: nlat = 41, nlon = 66, ntime = 540
+  real(wp)           :: precip(nlon, nlat, ntime)
+  character(len=128) :: filename
 
-  print *, "Reading NetCDF precipitation data..."
-  filename = "data/historical/precip_monthly.nc" 
+  ! File location (adjust as needed)
+  filename = "data/historical/precip_monthly.nc"
 
-  call read_precip_from_netcdf(trim(filename), precip, lon, lat, time, status)
+  ! Read precipitation variable ("tp")
+  call read_precip_from_netcdf(filename, "tp", precip, nlon, nlat, ntime)
 
-  if (status == 0) then
-    print *, "File read successfully!"
-    print *, "Dimensions:"
-    print *, "  Longitude points:", size(lon)
-    print *, "  Latitude points :", size(lat)
-    print *, "  Time steps      :", size(time)
-  else
-    print *, "NetCDF read failed. Status code =", status
-  end if
 end program main

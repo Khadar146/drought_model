@@ -1,0 +1,9 @@
+ NetCDF file: data/historical/precip_monthly.nc
+ Variable: tp
+ Dimensions:           66  x           41  x          540
+ Missing values:       490860  (   33.592017738359203      %)
+ Min (m/month):    3.2381370829170919E-007
+ Max (m/month):    2.4174017831683159E-002
+ Mean (m/month):    6.7086131910144625E-004
+ Negative values:            0
+ Extreme values (>2.0 m/month):            0
