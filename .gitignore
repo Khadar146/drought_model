@@ -1,34 +1,53 @@
-*.txt
-*.pptx
-*.png
-*.DS_Store
-output/
-data/Climate/
-data/Raw/
-# Ignore large/unnecessary files
+# EXCLUDE DOCUMENTATION, OUTPUTS, AND TESTS (as requested)
+docs/
+outputs/
+test/
+
+# Exclude status and summary files (as requested)
+PROJECT_STATUS_SUMMARY.md
+QUICK_REFERENCE.md
+VALIDATION_REPORT.md
+CAN_IT_RUN_YES.md
+CLEAN_STRUCTURE_SUMMARY.md
+CURRENT_APP_STRUCTURE.md
+FINAL_DATA_REQUIREMENTS.md
+FOLDER_ORGANIZATION_SUMMARY.md
+GITHUB_SYNC_STRATEGY.md
+project.md
+
+# Exclude large data files
+data/
+*.nc
+*.dat
 *.zip
-*.pptx
-*.png
-*.DS_Store
+
+# Exclude build artifacts
 build/
-data/Climate/
-data/Raw
-/build/
-*.zip
-*.pptx
-*.csv
-*.png
-*.pdf
-*.xlsx
-*.zip
-*.pptx
-*.png
-*.DS_Store
-output/
-data/Climate/
-*.zip
+*.mod
+*.smod
+*.o
+*.exe
+a.out
+
+# Exclude temporary and office files
+*.tmp
+*.log
+*~
 *.txt
 *.doc
-*.DS_Store
-build/
-data/Climate/
+*.docx
+*.pptx
+*.pdf
+*.xlsx
+*.csv
+*.png
+
+# Exclude system files
+.DS_Store
+
+# Exclude IDE files
+.vscode/
+*.code-workspace
+
+# Exclude Fortran Package Manager cache
+.fpm/

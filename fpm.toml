@@ -15,10 +15,11 @@ implicit-typing = false
 implicit-external = false
 source-form = "free"
 
-[[executable]]
-name = "Historical"
-source-dir = "app"
-main = "main_historical.f90"
-
 [dependencies]
 fsml = { git = "https://github.com/sebastian-mutz/fsml.git" }
+stdlib = "*"
+
+[[executable]]
+name = "DroughtAnalysis"
+source-dir = "app"
+main = "main_drought_analysis.f90"

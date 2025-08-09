@@ -23,7 +23,7 @@
 module spi_mod
   use iso_fortran_env, only: wp => real64
   use, intrinsic :: ieee_arithmetic, only: ieee_is_nan, ieee_value, ieee_quiet_nan
-  use fsml_dst,  only: f_dst_gammai_core, f_dst_norm_ppf_core
+  use fsml_dst,  only: f_dst_gamma_cdf_core, f_dst_norm_ppf_core
   implicit none
   private
   public :: compute_spi
@@ -181,16 +181,22 @@ contains
     logical,  intent(out) :: okfit
 
     real(wp) :: mean_pos, var_pos, v
+    real(wp) :: sum_pos, sum_sq_pos
     integer  :: count_all, count_pos, t
+    real(wp), parameter :: min_samples = 8.0_wp  ! Increased from 5
+    real(wp), parameter :: zero_threshold = 1.0e-6_wp
 
     shape = ieee_value(0.0_wp, ieee_quiet_nan)
     scale = ieee_value(0.0_wp, ieee_quiet_nan)
     p_zero = 0.0_wp
     okfit  = .false.
 
-    count_all = 0; count_pos = 0
-    mean_pos  = 0.0_wp; var_pos = 0.0_wp
+    count_all = 0
+    count_pos = 0
+    sum_pos   = 0.0_wp
+    sum_sq_pos = 0.0_wp
 
+    ! First pass: count and accumulate
     do t = k, ntime
       if (.not. ref_mask(t)) cycle
       if (month_idx(t) /= m_target) cycle
@@ -198,29 +204,31 @@ contains
 
       count_all = count_all + 1
       v = acc(t)
-      if (v > 0.0_wp) then
+      if (v > zero_threshold) then
         count_pos = count_pos + 1
-        mean_pos  = mean_pos + v
+        sum_pos = sum_pos + v
+        sum_sq_pos = sum_sq_pos + v*v
       end if
     end do
 
     if (count_all > 0) p_zero = real(count_all - count_pos, wp) / real(count_all, wp)
 
-    if (count_pos >= 5) then
-      mean_pos = mean_pos / real(count_pos, wp)
-      do t = k, ntime
-        if (.not. ref_mask(t)) cycle
-        if (month_idx(t) /= m_target) cycle
-        if (ieee_is_nan(acc(t))) cycle
-        v = acc(t)
-        if (v > 0.0_wp) var_pos = var_pos + (v - mean_pos)**2
-      end do
-      if (count_pos > 1) var_pos = var_pos / real(count_pos - 1, wp)
+    if (count_pos >= min_samples) then
+      mean_pos = sum_pos / real(count_pos, wp)
+      var_pos = (sum_sq_pos - sum_pos*sum_pos/real(count_pos, wp)) / real(count_pos - 1, wp)
 
-      if (mean_pos > 0.0_wp .and. var_pos > 0.0_wp) then
-        shape = (mean_pos**2) / var_pos
-        scale = var_pos / mean_pos
-        okfit = .true.
+      if (mean_pos > zero_threshold .and. var_pos > zero_threshold) then
+        ! Check coefficient of variation for reasonable gamma fit
+        if (var_pos/mean_pos**2 < 10.0_wp .and. var_pos/mean_pos**2 > 0.01_wp) then
+          shape = (mean_pos**2) / var_pos
+          scale = var_pos / mean_pos
+          
+          ! Validate parameters are in reasonable range
+          if (shape > 0.1_wp .and. shape < 100.0_wp .and. &
+              scale > 1.0e-6_wp .and. scale < 1.0e6_wp) then
+            okfit = .true.
+          end if
+        end if
       end if
     end if
   end subroutine fit_gamma_ref_month_arrays
@@ -235,16 +243,22 @@ contains
     logical,  intent(out) :: okfit
 
     real(wp) :: mean_pos, var_pos, v
+    real(wp) :: sum_pos, sum_sq_pos
     integer  :: count_all, count_pos, t, m
+    real(wp), parameter :: min_samples = 8.0_wp
+    real(wp), parameter :: zero_threshold = 1.0e-6_wp
 
     shape = ieee_value(0.0_wp, ieee_quiet_nan)
     scale = ieee_value(0.0_wp, ieee_quiet_nan)
     p_zero = 0.0_wp
     okfit  = .false.
 
-    count_all = 0; count_pos = 0
-    mean_pos  = 0.0_wp; var_pos = 0.0_wp
+    count_all = 0
+    count_pos = 0
+    sum_pos   = 0.0_wp
+    sum_sq_pos = 0.0_wp
 
+    ! First pass: count and accumulate
     do t = k, ntime
       if (.not. ref_mask(t)) cycle
       m = month_of_index(t, start_month)
@@ -253,43 +267,43 @@ contains
 
       count_all = count_all + 1
       v = acc(t)
-      if (v > 0.0_wp) then
+      if (v > zero_threshold) then
         count_pos = count_pos + 1
-        mean_pos  = mean_pos + v
+        sum_pos = sum_pos + v
+        sum_sq_pos = sum_sq_pos + v*v
       end if
     end do
 
     if (count_all > 0) p_zero = real(count_all - count_pos, wp) / real(count_all, wp)
 
-    if (count_pos >= 5) then
-      mean_pos = mean_pos / real(count_pos, wp)
-      do t = k, ntime
-        if (.not. ref_mask(t)) cycle
-        m = month_of_index(t, start_month)
-        if (m /= m_target) cycle
-        if (ieee_is_nan(acc(t))) cycle
-        v = acc(t)
-        if (v > 0.0_wp) var_pos = var_pos + (v - mean_pos)**2
-      end do
-      if (count_pos > 1) var_pos = var_pos / real(count_pos - 1, wp)
+    if (count_pos >= min_samples) then
+      mean_pos = sum_pos / real(count_pos, wp)
+      var_pos = (sum_sq_pos - sum_pos*sum_pos/real(count_pos, wp)) / real(count_pos - 1, wp)
 
-      if (mean_pos > 0.0_wp .and. var_pos > 0.0_wp) then
-        shape = (mean_pos**2) / var_pos
-        scale = var_pos / mean_pos
-        okfit = .true.
+      if (mean_pos > zero_threshold .and. var_pos > zero_threshold) then
+        if (var_pos/mean_pos**2 < 10.0_wp .and. var_pos/mean_pos**2 > 0.01_wp) then
+          shape = (mean_pos**2) / var_pos
+          scale = var_pos / mean_pos
+          
+          if (shape > 0.1_wp .and. shape < 100.0_wp .and. &
+              scale > 1.0e-6_wp .and. scale < 1.0e6_wp) then
+            okfit = .true.
+          end if
+        end if
       end if
     end if
   end subroutine fit_gamma_ref_month_linear
 
   !----------------------------------------------!
   ! Gamma → probability → Normal quantile (SPI)  !
+  ! FIXED: Use proper FSML gamma CDF function    !
   !----------------------------------------------!
   pure function gamma_to_spi(value, shape, scale, p_zero) result(spi_val)
     real(wp), intent(in) :: value, shape, scale, p_zero
     real(wp) :: spi_val, Pg, P
-    real(wp), parameter :: eps = 1.0e-12_wp
+    real(wp), parameter :: eps = 1.0e-15_wp
 
-    if (shape <= 0.0_wp .or. scale <= 0.0_wp) then
+    if (shape <= 0.0_wp .or. scale <= 0.0_wp .or. p_zero < 0.0_wp .or. p_zero > 1.0_wp) then
       spi_val = ieee_value(0.0_wp, ieee_quiet_nan)
       return
     end if
@@ -297,13 +311,18 @@ contains
     if (value <= 0.0_wp) then
       Pg = 0.0_wp
     else
-      Pg = f_dst_gammai_core(value/scale, shape) / gamma(shape)
+      ! FIXED: Use proper FSML gamma CDF function
+      ! f_dst_gamma_cdf_core(x, alpha=shape, beta=scale, loc=0, tail="left")
+      Pg = f_dst_gamma_cdf_core(value, alpha=shape, beta=scale, loc=0.0_wp, tail="left")
     end if
 
     P = p_zero + (1.0_wp - p_zero) * Pg
     P = max(eps, min(1.0_wp - eps, P))
 
     spi_val = f_dst_norm_ppf_core(P, 0.0_wp, 1.0_wp)
+    
+    ! NOTE: No artificial capping - allows full scientific range
+    ! Extreme values indicate gamma fitting issues that need investigation
   end function gamma_to_spi
 
   !---------------------------!
