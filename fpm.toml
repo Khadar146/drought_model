@@ -16,6 +16,9 @@ implicit-external = false
 source-form = "free"
 
 [[executable]]
-name = "main"
+name = "Historical"
 source-dir = "app"
-main = "main.f90"
+main = "main_historical.f90"
+
+[dependencies]
+fsml = { git = "https://github.com/sebastian-mutz/fsml.git" }
