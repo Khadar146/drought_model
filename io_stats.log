@@ -1,9 +1,0 @@
- NetCDF file: data/historical/precip_monthly.nc
- Variable: tp
- Dimensions (lon x lat x time):           66  x           41  x          540
- Missing values:       490860  (   33.592017738359203      %)
- Negative values:            0
- Extreme values (>2.0 m/month):            0
- time var: valid_time
- time units: seconds since 1970-01-01
- calendar: proleptic_gregorian
