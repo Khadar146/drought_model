@@ -20,6 +20,6 @@ fsml = { git = "https://github.com/sebastian-mutz/fsml.git" }
 stdlib = "*"
 
 [[executable]]
-name = "DroughtAnalysis"
+name = "HistoricalSPI"
 source-dir = "app"
-main = "main_drought_analysis.f90"
+main = "analysis_historical.f90"

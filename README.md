@@ -1,52 +1,37 @@
-# Somaliland Drought Analysis System
+# Somaliland Drought Analysis
 
-## 🌍 Project Overview
+Fortran-based drought monitoring system for Somaliland using Standardized Precipitation Index (SPI) analysis.
 
-A comprehensive Fortran-based system for analyzing drought patterns in Somaliland, designed to test the hypothesis that **future droughts will become more extreme and frequent due to climate change**.
+## Requirements
+- Fortran compiler (gfortran)
+- NetCDF-Fortran library
+- Fortran Package Manager (fpm)
 
-## 🎯 Research Hypothesis
-
-**"Droughts in Somaliland will become more extreme and frequent in the future based on climate projections"**
-
-This system provides:
-- ✅ **Historical drought baseline** (1980-2024) - COMPLETED
-- 🔄 **Future drought projections** (2025-2100) - IN DEVELOPMENT
-- 📊 **Comparative change analysis** - PLANNED
-
-## 🏗️ Project Structure
-
-```
-📁 droughtmodel/
-├── 📁 src/                    # Core analysis modules
-├── 📁 app/
-│   ├── 📁 historical/         # Historical analysis (SPI + EVT)
-│   └── 📁 future/            # Future projections (SPI + EVT)
-├── 📁 outputs/
-│   ├── 📁 historical/         # Historical results
-│   ├── 📁 future/            # Future projection results  
-│   └── 📁 comparison/        # Change analysis
-├── 📁 data/
-│   ├── 📁 climate/historical/ # Historical precipitation data
-│   └── 📁 climate/future/    # Climate projection data
-├── 📁 test/                   # Validation and testing
-└── 📁 docs/                   # Documentation
+## Build
+```bash
+chmod +x build.sh
+./build.sh
 ```
 
-## 🔬 Scientific Methods
+## Usage
+```bash
+fpm run HistoricalSPI
+```
 
-### Historical Analysis ✅
-- **SPI Calculation**: Standardized Precipitation Index using FSML statistical routines
-- **EVT Analysis**: Extreme Value Theory with Generalized Pareto Distribution
-- **Reference Period**: 1991-2020 (WMO standard)
-- **Temporal Resolution**: Monthly data, multiple accumulation periods (1, 3, 6, 12 months)
+## Structure
+```
+app/                    # Main application
+src/                    # Core modules (io_mod, prep_mod, spi_mod)
+data/                   # Input data
+outputs/                # Results
+```
 
-### Future Projections 🔄
-- **Climate Models**: CMIP6 projections (SSP scenarios)
-- **Bias Correction**: Statistical adjustment using historical relationships
-- **Future SPI**: Using historical gamma parameters for consistency
-- **Change Detection**: Quantitative assessment of drought frequency/intensity changes
+## Outputs
+- NetCDF files with SPI values (1, 3, 6, 12 months)
+- Statistical summaries (CSV)
 
-## 🚀 Quick Start
+## Study Area
+Somaliland region using ERA5-Land precipitation data (0.1° resolution, 1980-2024)
 
 ### Prerequisites
 - Fortran compiler (gfortran recommended)
