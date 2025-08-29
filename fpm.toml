@@ -2,8 +2,9 @@ name = "droughtmodel"
 version = "0.1.0"
 license = "MIT"
 author = "Khadar Daahir"
-maintainer = "khadar@glasgow.ac.uk"
+maintainer = "khadardahir146@gmail.com"
 copyright = "Copyright 2025, Khadar"
+description = "Somaliland Drought Analysis Pipeline - Climate Change Impact Assessment"
 
 [build]
 external-modules = ["netcdf"]
@@ -19,7 +20,9 @@ source-form = "free"
 fsml = { git = "https://github.com/sebastian-mutz/fsml.git" }
 stdlib = "*"
 
+# Main drought analysis pipeline
 [[executable]]
-name = "HistoricalSPI"
+name = "drought_pipeline"
 source-dir = "app"
-main = "analysis_historical.f90"
+main = "main.f90"
+link = ["netcdf", "netcdff"]
