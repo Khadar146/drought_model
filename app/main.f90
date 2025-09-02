@@ -26,7 +26,7 @@ program main
                          load_corrected_cmip6_scenario, cmip6_scenario_data_t, corrected_cmip6_scenarios_t
     use spi_module, only: calculate_spi_timescales
     use spei_module, only: calculate_spei_timescales, era5_spei_results_t, calculate_era5_spei_structured
-    use cmip6_bias_correction, only: process_cmip6_bias_correction_proper, process_cmip6_bias_correction_structured
+    use bias_correction_clean, only: process_bias_correction
     use projection_module, only: calculate_future_spei, calculate_future_spei_structured, cmip6_spei_results_t
     use evt_module, only: run_evt_analysis, evt_results
     implicit none
@@ -326,9 +326,9 @@ program main
     if (success) then
         print *, ""
         print *, "🔄 Using structured memory-based approach (consistent with ERA5)..."
-        call process_cmip6_bias_correction_structured(precipitation, pet, latitudes, longitudes, &
-                                                     cmip6_historical, cmip6_ssp126, cmip6_ssp245, cmip6_ssp585, &
-                                                     corrected_scenarios, success)
+        call process_bias_correction(precipitation, pet, &
+                                    cmip6_historical, cmip6_ssp126, cmip6_ssp245, cmip6_ssp585, &
+                                    corrected_scenarios, success)
     end if
     
     if (success) then

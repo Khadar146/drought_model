@@ -403,7 +403,7 @@ contains
     end subroutine process_single_scenario_modular
 
     !-------------------------------------------------------------------
-    ! PROCESS SINGLE EMISSION SCENARIO - LEGACY VERSION (LOADS DATA INTERNALLY)
+    ! PROCESS SINGLE EMISSION SCENARIO 
     !-------------------------------------------------------------------
     subroutine process_single_scenario(scenario_name, success)
         implicit none
@@ -467,7 +467,7 @@ contains
                                       spei_1, spei_3, spei_6, spei_12)
         write(*,*) "   ✅ SPEI calculated successfully"
         
-        ! Step 5: Save drought indices (placeholder for now)
+        ! Step 5: Save drought indices 
         write(*,*) "   💾 Saving future drought indices for ", trim(scenario_name), "..."
         call save_future_drought_indices(scenario_name, spi_1, spi_3, spi_6, spi_12, &
                                         spei_1, spei_3, spei_6, spei_12, &
@@ -488,44 +488,6 @@ contains
         
     end subroutine process_single_scenario
 
-    !-------------------------------------------------------------------
-    ! COMPUTE FUTURE WATER BALANCE (to be implemented)
-    !-------------------------------------------------------------------
-    ! subroutine compute_future_water_balance(precip, pet, water_balance)
-    !     implicit none
-    !     real(dp), intent(in) :: precip(:,:,:)
-    !     real(dp), intent(in) :: pet(:,:,:)
-    !     real(dp), intent(out) :: water_balance(:,:,:)
-    !     
-    !     ! Calculate water balance for future projections
-    !     
-    ! end subroutine compute_future_water_balance
     
-    !-------------------------------------------------------------------
-    ! CALCULATE FUTURE SPEI USING REFERENCE PARAMETERS (to be implemented)
-    !-------------------------------------------------------------------
-    ! subroutine calculate_future_spei_values(water_balance, spei_values)
-    !     implicit none
-    !     real(dp), intent(in) :: water_balance(:,:,:)
-    !     real(dp), intent(out) :: spei_values(:,:,:,:)  ! (time, lat, lon, timescale)
-    !     
-    !     ! Use distribution parameters from historical period
-    !     ! Apply to future water balance data
-    !     
-    ! end subroutine calculate_future_spei_values
-    
-    !-------------------------------------------------------------------
-    ! ANALYSE DROUGHT TRENDS (to be implemented)
-    !-------------------------------------------------------------------
-    ! subroutine analyse_drought_trends(spei_data, scenario_name)
-    !     implicit none
-    !     real(dp), intent(in) :: spei_data(:,:,:,:)
-    !     character(len=*), intent(in) :: scenario_name
-    !     
-    !     ! Analyse trends in drought frequency, severity, duration
-    !     ! Compare different time periods
-    !     ! Generate trend statistics
-    !     
-    ! end subroutine analyse_drought_trends
 
 end module projection_module

@@ -25,4 +25,5 @@ stdlib = "*"
 name = "drought_pipeline"
 source-dir = "app"
 main = "main.f90"
-link = ["netcdf", "netcdff"]
+
+

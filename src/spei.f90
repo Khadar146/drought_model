@@ -16,7 +16,7 @@ module spei_module
     implicit none
     
     private
-    public :: calculate_spei_timescales, era5_spei_results_t, calculate_era5_spei_structured
+    public :: calculate_spei_timescales, era5_spei_results_t, calculate_era5_spei_structured, calculate_single_spei
     
     ! Constants
     integer, parameter :: dp = real64

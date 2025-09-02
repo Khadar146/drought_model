@@ -29,7 +29,7 @@ module evt_module
     implicit none
     
     private
-    public :: run_evt_analysis, gpd_parameters, evt_results
+    public :: run_evt_analysis, gpd_parameters, evt_results, extract_exceedances, fit_gpd_profile_mle
     
     integer, parameter :: dp = real64
     real(dp), parameter :: FILL_VALUE = -999.0_dp
@@ -117,8 +117,10 @@ contains
         
         ! Calculate exceedance probability for historical 20-year event
         hist_20yr = results%return_levels(2)
-        results%exceed_prob = 1.0_dp - fsml_gpd_cdf(hist_20yr, results%params%xi, &
-                                                   results%params%mu, results%params%sigma)
+        ! For drought analysis: probability of being below the drought level
+        ! Convert drought level back to positive exceedance scale for CDF calculation
+        results%exceed_prob = fsml_gpd_cdf(abs(hist_20yr - results%params%mu), &
+                                         results%params%xi, 0.0_dp, results%params%sigma)
         
         ! Output summary
         call print_evt_summary(results)
@@ -420,21 +422,24 @@ contains
         do i = 1, 3
             prob = 1.0_dp - 1.0_dp / return_periods(i)
             
-            ! Return level calculation using FSML GPD inverse CDF
-            return_level = fsml_gpd_ppf(prob, xi, params%mu, sigma)
+            ! Return level calculation for drought analysis (below threshold)
+            ! For drought: return_level = threshold - GPD_quantile(prob)
+            ! This gives negative SPEI values for drought events
+            return_level = params%mu - fsml_gpd_ppf(prob, xi, 0.0_dp, sigma)
             return_levels(i) = return_level
             
             ! Delta method for confidence intervals (Coles, 2001, Section 4.3.3)
+            ! For drought analysis: derivatives need sign correction
             if (abs(xi) < EPS) then
                 ! Exponential case
                 log_term = -log(1.0_dp - prob)
-                drl_dsigma = log_term
+                drl_dsigma = -log_term  ! Negative for drought direction
                 drl_dxi = 0.0_dp
             else
-                ! General GPD case  
+                ! General GPD case - negative derivatives for drought direction
                 log_term = -log(1.0_dp - prob)
-                drl_dsigma = ((1.0_dp - prob)**(-xi) - 1.0_dp) / xi
-                drl_dxi = (sigma / (xi**2)) * (((1.0_dp - prob)**(-xi)) * &
+                drl_dsigma = -(((1.0_dp - prob)**(-xi) - 1.0_dp) / xi)
+                drl_dxi = -(sigma / (xi**2)) * (((1.0_dp - prob)**(-xi)) * &
                          log(1.0_dp - prob) - ((1.0_dp - prob)**(-xi) - 1.0_dp))
             end if
             
@@ -558,7 +563,8 @@ contains
         do t = 1, ntime
             do i = 1, ncell
                 value = data(t,i)
-                if (value /= FILL_VALUE) then
+                ! Use same data validation as extract_valid_data in evt_threshold_diagnostics
+                if (abs(value - FILL_VALUE) > 1e-6 .and. abs(value) < 100.0_dp) then
                     ! For drought analysis, we typically look at exceedances 
                     ! below the threshold (extreme negative SPEI values)
                     if (value < threshold) then
